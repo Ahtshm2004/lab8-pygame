@@ -52,7 +52,7 @@ class Square:
 def main():
 	pygame.init()
 	screen = pygame.display.set_mode((WIDTH, HEIGHT))
-	pygame.display.set_caption("10 Random Moving Squares")
+	pygame.display.set_caption("100 Random Moving Squares")
 	clock = pygame.time.Clock()
 
 	squares = [Square(size=random.randint(MIN_SIZE, MAX_SIZE)) for _ in range(NUM_SQUARES)]
