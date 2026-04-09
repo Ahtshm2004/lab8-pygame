@@ -118,3 +118,68 @@ All interactions logged in chronological order (oldest first).
 - **Socratic Mode**: ON (now enabled)
 - **Changes Made**: No code changes. Explained why Socratic Mode was OFF and enabled it going forward. User correctly identified that this interaction was not logged in JOURNAL.md—fixing that now.
 - **Context and Reasons for Changes**: Socratic Mode should default to ON per copilot-instructions.md. Previous interactions operated in direct-implementation mode without explicit user toggle. User called out missing journal entry, highlighting the requirement to log *every* interaction, even educational ones without code changes.
+
+---
+
+### **Interaction 10: Documentation Updates**
+- **Agent Version**: 2.2
+- **Date**: 09-04-2026 14:30
+- **User**: Ahtshm2004
+- **Prompt**: "I want you to modify the Report, README and requirements files according to the code in the main.py"
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GitHub Copilot
+- **Socratic Mode**: ON
+- **Changes Made**: Updated README.md with size-based speed scaling details; rewrote REPORT.md with comprehensive project analysis (successes, failures, learnings); updated main.py window caption.
+- **Context and Reasons for Changes**: Documentation needed to reflect inertia fleeing implementation (K constant, size-based velocity). REPORT.md expanded to analyze AI interaction successes/failures and document lessons learned.
+
+---
+
+### **Interaction 11: Fleeing & Wander Behavior Design**
+- **Agent Version**: 2.2
+- **Date**: 09-04-2026 15:00
+- **User**: Ahtshm2004
+- **Prompt**: "Now, I want to work on these functions: Make the smaller squares flee away from the bigger ones / All squares tend to keep a certain randomness to their behavior / trajectory"
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GitHub Copilot
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Guided user through behavior design with Socratic questions about fleeing mechanics, randomness approach, and distance calculations.
+- **Context and Reasons for Changes**: User provided detailed technical reasoning about inertia, threat detection, and wander behavior. Clarified design decisions before implementation.
+
+---
+
+### **Interaction 12: Behavioral Design Decisions**
+- **Agent Version**: 2.2
+- **Date**: 09-04-2026 15:15
+- **User**: Ahtshm2004
+- **Prompt**: Series of technical questions clarifying: distance-squared optimization, velocity blending weights, jitter frequency/magnitude, and fleeing relative comparisons.
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GitHub Copilot
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. User provided sophisticated design decisions: distance-squared comparisons for performance, Option C blending (80% current + 20% flee), random 10% chance with ±5–10° jitter, small-from-large fleeing.
+- **Context and Reasons for Changes**: User articulated clear implementation strategy before coding. Socratic dialogue established well-reasoned design.
+
+---
+
+### **Interaction 13: Fleeing & Wander Implementation**
+- **Agent Version**: 2.2
+- **Date**: 09-04-2026 15:30
+- **User**: Ahtshm2004
+- **Prompt**: Confirmed design choices (distance-squared, Option C blending, 10% jitter chance, Option A angle preservation).
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GitHub Copilot
+- **Socratic Mode**: ON
+- **Changes Made**: Added `math` import; added fleeing/wander constants (FLEE_RADIUS_MULTIPLIER=3.5, FLEE_FORCE_WEIGHT=0.2, WANDER_CHANCE=0.1, WANDER_ANGLE_RANGE=10); implemented Square methods: `get_center()`, `apply_wander()` (angle-based jitter), `calculate_flee_force()` (threat detection, normalized flee direction); updated `update()` to accept all_squares, apply wander, calculate and blend fleeing forces; updated main loop to pass squares to update().
+- **Context and Reasons for Changes**: Implemented sophisticated behavioral system where small squares flee from larger ones with smooth blending, plus organic wander/jitter. Design prioritizes realistic physics (angle preservation) and performance (distance-squared optimization). Verified syntax; running demo shows emergent ecosystem behavior.
+
+---
+
+### **Interaction 14: Comprehensive Documentation Update**
+- **Agent Version**: 2.2
+- **Date**: 09-04-2026 15:45
+- **User**: Ahtshm2004
+- **Prompt**: "Now, I want you to modify the Report and Readme files exactly according to the code in main.py"
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GitHub Copilot
+- **Socratic Mode**: ON
+- **Changes Made**: Completely rewrote README.md with fleeing/wander features, configuration tables, physics explanations with formulas, customization examples, and performance notes. Extensively expanded REPORT.md with: architectural analysis, complete physics equations (LaTeX), behavioral dynamics explanation, performance/scalability assessment, design trade-offs table, and 10 future enhancement possibilities. Updated main.py window caption.
+- **Context and Reasons for Changes**: Documentation must accurately reflect sophisticated final implementation. README restructured to explain inertia scaling, fleeing mechanics, wandering behavior, and frame-rate independence with concrete examples. REPORT.md enhanced to document technical decisions, emergent properties, and scalability analysis.

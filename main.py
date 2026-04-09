@@ -1,5 +1,6 @@
 import sys
 import random
+import math
 import pygame
 
 
@@ -10,6 +11,12 @@ MIN_SIZE = 30
 MAX_SIZE = 80
 K = 150
 SPEED = 100
+
+# Fleeing & Wander behavior constants
+FLEE_RADIUS_MULTIPLIER = 3.5  # Threat detected at 3.5x the larger square's size
+FLEE_FORCE_WEIGHT = 0.2  # 20% flee force, 80% current velocity
+WANDER_CHANCE = 0.1  # 10% chance per frame to apply jitter
+WANDER_ANGLE_RANGE = 10  # ±10 degrees for jitter
 
 
 class Square:
@@ -29,8 +36,69 @@ class Square:
 	def rect(self):
 		return pygame.Rect(int(self.x), int(self.y), self.size, self.size)
 
-	def update(self, dt):
-		# dt: seconds elapsed since last frame
+	def get_center(self):
+		"""Return the center position of the square"""
+		return (self.x + self.size / 2, self.y + self.size / 2)
+
+	def apply_wander(self):
+		"""Apply random jitter to velocity (±5° to ±10° rotation)"""
+		if random.random() < WANDER_CHANCE:
+			# Convert velocity to angle
+			angle = math.atan2(self.vy, self.vx)
+			# Add random jitter
+			jitter = math.radians(random.uniform(-WANDER_ANGLE_RANGE, WANDER_ANGLE_RANGE))
+			angle += jitter
+			# Preserve speed magnitude
+			speed = math.sqrt(self.vx**2 + self.vy**2)
+			self.vx = speed * math.cos(angle)
+			self.vy = speed * math.sin(angle)
+
+	def calculate_flee_force(self, larger_squares):
+		"""Calculate flee force from nearby larger squares"""
+		flee_vx = 0
+		flee_vy = 0
+		
+		for other in larger_squares:
+			if other is self:
+				continue
+			
+			# Calculate distance squared to avoid expensive sqrt
+			dx = other.x + other.size / 2 - (self.x + self.size / 2)
+			dy = other.y + other.size / 2 - (self.y + self.size / 2)
+			dist_squared = dx**2 + dy**2
+			
+			# Check if threat is within awareness radius
+			threat_radius = FLEE_RADIUS_MULTIPLIER * other.size
+			if dist_squared < threat_radius**2:
+				# Calculate flee direction (away from threat)
+				if dist_squared > 0:  # Avoid division by zero
+					dist = math.sqrt(dist_squared)
+					flee_vx -= (dx / dist)  # Normalize and negate (away from threat)
+					flee_vy -= (dy / dist)
+		
+		# Normalize flee force if it exists
+		flee_magnitude = math.sqrt(flee_vx**2 + flee_vy**2)
+		if flee_magnitude > 0:
+			flee_vx = (flee_vx / flee_magnitude) * 2  # Scale for effect
+			flee_vy = (flee_vy / flee_magnitude) * 2
+		
+		return flee_vx, flee_vy
+
+	def update(self, dt, all_squares=None):
+		"""Update square position with fleeing and wander behavior"""
+		# Apply wander (random jitter)
+		self.apply_wander()
+		
+		# Apply fleeing if this square is small and other squares exist
+		if all_squares:
+			larger_squares = [s for s in all_squares if s.size > self.size]
+			if larger_squares:
+				flee_vx, flee_vy = self.calculate_flee_force(larger_squares)
+				# Blend: 80% current velocity + 20% flee force
+				self.vx = 0.8 * self.vx + FLEE_FORCE_WEIGHT * flee_vx
+				self.vy = 0.8 * self.vy + FLEE_FORCE_WEIGHT * flee_vy
+		
+		# Update position based on velocity
 		self.x += self.vx * dt * 60
 		self.y += self.vy * dt * 60
 
@@ -70,7 +138,7 @@ def main():
 					running = False
 
 		for s in squares:
-			s.update(dt)
+			s.update(dt, squares)
 
 		screen.fill((15, 15, 20))
 

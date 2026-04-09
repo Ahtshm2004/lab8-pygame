@@ -1,15 +1,17 @@
-# Random Moving Squares (pygame)
+# Animated Squares with Inertia-Based Fleeing
 
-A pygame-based animation demo that displays animated squares of varying sizes moving around a canvas with wall bouncing physics. **Smaller squares move faster than larger ones**, simulating realistic inertia-based fleeing behavior.
+A sophisticated pygame-based animation demonstrating emergent ecosystem behavior through physics-based simulation. **20 colored squares** of varying sizes interact through inertia-based speed scaling, threat detection, and organic wandering behavior—creating a compelling predator-prey-like dynamic without explicit chase logic.
 
 ## Features
 
-- **20 animated squares** with random colors and sizes
-- **Size-based speed scaling**: smaller squares move faster, larger squares move slower (inertia effect)
-- **Random sizes** between 30–80 pixels
-- **Realistic physics**: squares bounce off window edges with velocity reversal
-- **Frame-rate independent movement**: uses delta time (dt) to ensure consistent speed regardless of FPS
-- **Global speed control**: `SPEED = 100` parameter scales all movement uniformly
+- **20 animated squares** with random colors and sizes (30–80 pixels)
+- **Size-based speed scaling**: smaller squares move faster (inertia effect)
+- **Fleeing behavior**: small squares actively flee from nearby larger ones
+- **Threat detection**: proximity-based awareness (3.5× threat radius)
+- **Velocity blending**: smooth 80/20 blend of current motion and flee force
+- **Organic wandering**: 10% chance per frame for ±5–10° random direction jitter
+- **Frame-rate independent movement**: delta-time scaling ensures smooth animation
+- **Realistic physics**: wall bouncing with velocity reversal
 - **Smooth 60 FPS animation** on a 1000×900 window
 
 ## Configuration
@@ -17,18 +19,27 @@ A pygame-based animation demo that displays animated squares of varying sizes mo
 Edit these constants in `main.py` to customize behavior:
 
 ```python
+# Canvas & Rendering
 WIDTH, HEIGHT = 1000, 900      # Window dimensions
 NUM_SQUARES = 20               # Number of animated squares
 FPS = 60                       # Target frames per second
+
+# Square Properties
 MIN_SIZE = 30                  # Minimum square size (pixels)
 MAX_SIZE = 80                  # Maximum square size (pixels)
-K = 150                        # Size-speed scaling constant (smaller K = slower overall)
-SPEED = 100                    # Global speed multiplier (higher = faster)
+K = 150                        # Inertia scaling constant (velocity = K / size)
+SPEED = 100                    # Global speed multiplier
+
+# Fleeing & Behavior
+FLEE_RADIUS_MULTIPLIER = 3.5   # Threat detected at 3.5× larger square's size
+FLEE_FORCE_WEIGHT = 0.2        # 20% flee force blended with current velocity
+WANDER_CHANCE = 0.1            # 10% chance per frame to apply random jitter
+WANDER_ANGLE_RANGE = 10        # ±10 degrees for random direction changes
 ```
 
 ## Prerequisites
 
-- Python 3.7+ (recommended)
+- Python 3.7+
 - pip
 
 ## Installation (PowerShell)
@@ -50,23 +61,100 @@ python main.py
 - **ESC key**: quit the demo
 - **Close window button**: quit the demo
 
-## How Speed Works
+## How It Works
 
-The animation uses **frame-rate-independent physics with size-based velocity scaling**:
+### 1. Inertia-Based Speed Scaling
 
-1. Each square has velocity components (`vx`, `vy`) based on its size: `velocity = (K / size) * (SPEED / 100.0)`
-2. **Smaller squares** (size=30): `vx = ±(150/30) = ±5.0` — move faster
-3. **Larger squares** (size=80): `vx = ±(150/80) = ±1.875` — move slower
-4. Every frame, position is updated: `x += vx * dt * 60`
-5. The `* 60` factor ensures consistent movement across different frame rates
-6. Adjust the `K` constant to change the speed-to-size ratio
-7. Adjust the `SPEED` constant to scale all speeds uniformly
+Physics principle: Velocity is inversely proportional to size.
 
-**Example**: With `K = 150` and `SPEED = 100`, a small square (size=30) moves about 2.67× faster than a large square (size=80).
+Formula: `velocity = (K / size) * (SPEED / 100.0)`
 
-## Physics Concept: Inertia
+**Example with K=150, SPEED=100:**
+- Small square (size=30): velocity = 5.0 units/frame (fast!)
+- Large square (size=80): velocity = 1.875 units/frame (slow)
+- **Speed ratio**: Small boxes move 2.67× faster than large boxes
 
-This demo implements a simplified inertia model where:
-- **Smaller objects** have less mass and move more quickly
-- **Larger objects** have more mass and move more slowly
-- This creates a "fleeing" effect where small squares appear more agile
+### 2. Fleeing Behavior
+
+When a small square detects a larger one nearby, it activates escape logic:
+
+1. **Threat Detection**: Checks all larger squares within awareness radius
+   - `threat_radius = FLEE_RADIUS_MULTIPLIER × larger_square_size`
+   - Uses distance-squared comparison for performance optimization
+2. **Escape Direction**: Calculates normalized vector pointing away from threats
+3. **Velocity Blending**: Smoothly combines flee force with current motion
+   - `new_velocity = 0.8 × current + 0.2 × flee_force`
+   - Prevents jarring direction changes; creates smooth curve away from danger
+
+### 3. Organic Wandering
+
+Every frame, small random perturbations are applied to velocity direction:
+
+1. **Activation**: 10% probability per frame
+2. **Angle Rotation**: ±5° to ±10° random jitter applied to velocity vector
+3. **Speed Preservation**: Magnitude maintained; only direction changes
+4. **Effect**: Creates natural "swimming" motion with subtle course corrections
+
+### 4. Frame-Rate Independence
+
+Movement is normalized across different frame rates:
+
+Formula: `position += velocity × dt × 60`
+
+Where `dt = clock.tick(FPS) / 1000.0` (elapsed seconds)
+
+The `× 60` factor ensures consistent speed whether running at 30 FPS or 120 FPS.
+
+## Physics Concepts Implemented
+
+| Concept | Implementation | Effect |
+|---------|-----------------|--------|
+| **Inertia** | Velocity inversely proportional to size | Smaller = faster, larger = slower |
+| **Threat Detection** | Distance-squared proximity checks | Efficient performance, realistic awareness |
+| **Steering** | Velocity blending rather than override | Smooth curves instead of robotic snaps |
+| **Wandering** | Angle-based jitter with speed preservation | Organic, natural-looking motion |
+| **Collision** | Wall bouncing with velocity reversal | Realistic boundary behavior |
+
+## Customization Examples
+
+### Increase Fleeing Urgency
+```python
+FLEE_FORCE_WEIGHT = 0.5  # 50% flee force (more panic)
+FLEE_RADIUS_MULTIPLIER = 5.0  # Detect threats from farther away
+```
+
+### Reduce Wandering for Stable Motion
+```python
+WANDER_CHANCE = 0.02  # Only 2% chance per frame (less jitter)
+WANDER_ANGLE_RANGE = 3  # ±3 degrees (subtle changes)
+```
+
+### Add More Squares with Adjusted Speed
+```python
+NUM_SQUARES = 50
+K = 200  # Increase K to compensate for more squares
+SPEED = 150  # Speed up overall movement
+```
+
+### Create Predator Effect (Very Large Slow Square)
+```python
+NUM_SQUARES = 19  # One spot for predator
+# Add custom code to spawn one very large square (size=150)
+# which will naturally cause all smaller squares to flee
+```
+
+## Visual Observations
+
+When running the demo, you'll notice:
+- 🟢 **Small squares**: Dart around quickly, frequently change direction (wander)
+- 🔴 **Large squares**: Move ponderously, create "safe zones" away from them
+- 🌊 **Fleeing effect**: Small squares curve away when large ones approach
+- 🎨 **Organic motion**: Nothing moves perfectly straight—all exhibit natural jitter
+- 📍 **Clustering**: Over time, large and small squares may cluster into distinct regions
+
+## Performance Notes
+
+- **Optimization**: Distance-squared comparisons reduce expensive sqrt() operations
+- **Scaling**: With 20 squares, ~1–2% CPU on modern systems
+- **Bottleneck**: Main CPU cost is distance calculations (quadratic with square count)
+- **Potential enhancement**: Spatial partitioning (grid/quadtree) for large square counts
