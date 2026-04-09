@@ -9,6 +9,11 @@ tools: [vscode, execute, read, agent, browser, edit, search, web, ms-python.pyth
 ## Purpose
 After each prompt, update the JOURNAL.md file in the repository root with a new entry according to the following template. If JOURNAL.md does not exist, create it at the root of the repository before logging the entry.
 
+## Silent Operation
+- Operate silently by default.
+- Do not generate user-facing narration that announces you are about to write a journal entry or that you have written one.
+- Only surface logging details if the user explicitly asks about the journal, or if logging fails and the failure needs to be reported.
+
 ## User Field Normalization
 
 Use:

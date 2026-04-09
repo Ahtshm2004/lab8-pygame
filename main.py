@@ -4,10 +4,11 @@ import pygame
 
 
 WIDTH, HEIGHT = 1000, 900
-NUM_SQUARES = 100
+NUM_SQUARES = 20
 FPS = 60
 MIN_SIZE = 30
 MAX_SIZE = 80
+K = 150
 SPEED = 100
 
 
@@ -16,9 +17,9 @@ class Square:
 		self.size = size
 		self.x = random.randint(0, WIDTH - size)
 		self.y = random.randint(0, HEIGHT - size)
-		# velocity scaled by SPEED constant
-		self.vx = random.choice([-1, 1]) * random.uniform(1.0, 3.5) * (SPEED / 100.0)
-		self.vy = random.choice([-1, 1]) * random.uniform(1.0, 3.5) * (SPEED / 100.0)
+		# velocity scaled by size (smaller = faster) and SPEED constant
+		self.vx = random.choice([-1, 1]) * (K / self.size) * (SPEED / 100.0)
+		self.vy = random.choice([-1, 1]) * (K / self.size) * (SPEED / 100.0)
 		self.color = (
 			random.randint(50, 255),
 			random.randint(50, 255),
@@ -52,7 +53,7 @@ class Square:
 def main():
 	pygame.init()
 	screen = pygame.display.set_mode((WIDTH, HEIGHT))
-	pygame.display.set_caption("100 Random Moving Squares")
+	pygame.display.set_caption("Animated Squares with Inertia-Based Fleeing")
 	clock = pygame.time.Clock()
 
 	squares = [Square(size=random.randint(MIN_SIZE, MAX_SIZE)) for _ in range(NUM_SQUARES)]
