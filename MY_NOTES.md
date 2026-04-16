@@ -1,52 +1,27 @@
 # Animated Squares — Learning Notes
 
-## Physics
+## 1. Physics & Math Logic
+* **Inverse Scaling**: Making speed inversely proportional to size (`K / size`) creates an immediate visual hierarchy. It gives the "illusion" of mass without a complex physics engine.
+* **Delta Time (dt)**: Always multiply movement by `dt`. This ensures that a square moving at 100 pixels per second actually moves that distance whether the computer is running at 30 FPS or 144 FPS.
+* **Square of Distance**: When checking if a square is in range, compare `distance_squared` against `radius_squared`. Avoiding `math.sqrt()` inside loops is a classic optimization for real-time simulations.
 
-**Size-based speed** — Smaller = faster. Divide a constant by size so small squares zip around while large ones lumber. No physics engine needed, just division.
-```
-v = K / size × (SPEED / 100)
-```
+## 2. Steering & Organic Motion
+* **Vector Blending**: Instead of forcing a square to point away from a threat instantly, use a weighted average (`0.8 * current + 0.2 * force`). This creates smooth, curved "steering" paths rather than jagged turns.
+* **Wander via Polar Coordinates**: To add jitter without changing speed, convert velocity to an angle (Polar), nudge it, and convert back to (x, y) coordinates (Cartesian). This keeps momentum perfectly preserved.
 
-**Frame-rate independence** — Always multiply movement by `dt` (time since last frame). Without it, the sim runs fast on fast machines and slow on slow ones.
-```
-pos += v × dt × 60
-```
+## 3. The Lifecycle Pattern
+* **State-Based Alpha**: Using age and lifespan to calculate transparency (`alpha`) makes the "birth" and "death" of objects feel intentional rather than like a glitchy flicker.
+* **Object Pooling (Simplified)**: Instead of letting the list grow indefinitely, the "count dead, then spawn replacements" logic keeps the memory footprint and CPU load constant.
 
----
+## 4. Software Design Lessons
+* **Surface Caching**: Drawing transparency is expensive in Pygame. Storing pre-rendered surfaces in a dictionary (`surface_cache`) based on size and color prevents the CPU from re-calculating pixels every single frame.
+* **Type Hinting**: Using `List['Square']` or `Tuple[int, int, int]` acts as "living documentation." It tells the editor exactly what the data is, catching bugs before the code even runs.
+* **Emergence**: Complexity doesn't require complex code. By giving squares just three rules (bounce, flee if smaller, wander), you get a simulation that looks like a living ecosystem.
 
-## Behaviors
-
-**Flee — smooth, not instant** — Don't snap to a new direction. Blend the flee force with current velocity so motion curves rather than jerks. The 80/20 split is a good starting point.
-```
-v_new = 0.8 × v_current + 0.2 × v_flee
-```
-
-**Threat detection trick** — Compare `dist²` to `radius²` instead of computing actual distance. You skip an expensive `sqrt()` and get the same result. Only call `sqrt()` when you actually need the distance value.
-
-**Wander — rotate, don't perturb** — To add jitter, convert velocity to an angle, nudge the angle, then convert back. Speed stays constant and only direction shifts slightly. Direct velocity tweaks cause speed drift over time.
-```
-angle = atan2(vy, vx) → angle ± rand(10°) → vx/vy
-```
-
----
-
-## Design Lessons
-
-**Constants at the top** — Put all tuneable values as named constants. Changing the feel of the sim becomes a one-liner, not a code hunt.
-
-**One method, one job** — `apply_wander()`, `calculate_flee_force()`, `update()` — each does exactly one thing. Easy to test, easy to swap out.
-
-**Emergent behavior** — There's no "predator" class. The ecosystem just happens from consistent local rules. Small rules + consistent application = surprising complexity.
-
-**Start simple, layer up** — Bouncing squares → size-based speed → flee → wander. Each layer was working before the next was added. Never build on a broken foundation.
-
----
-
-## Worth Remembering
-
-- `dt × 60` normalizes movement to a 60fps baseline
-- `dist²` avoids `sqrt()` — use it for comparisons
-- Angle rotation preserves speed magnitude
-- Blend ratio controls how snappy steering feels
-- 10% wander chance feels natural, 100% feels broken
-- Simple rules → complex emergent behavior
+## 5. Quick Reference
+| Concept | Code Implementation | Why it matters |
+| :--- | :--- | :--- |
+| **Normalization** | `dt * 60` | Baselines speed to 60 FPS. |
+| **Optimization** | `surface_cache` | Dramatically boosts FPS during rendering. |
+| **Steering** | `0.8 * v + 0.2 * f` | Makes movement look "alive" (inertia). |
+| **Readability** | `typing` module | Makes Python feel more robust and professional. |

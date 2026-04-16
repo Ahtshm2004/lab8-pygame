@@ -1,344 +1,709 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Code Explorer  main.py</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-<style>
-:root {
-  --bg: #1e1e2e;
-  --surface: #2a2a3e;
-  --surface2: #313148;
-  --text: #cdd6f4;
-  --muted: #a6adc8;
-  --accent: #89b4fa;
-  --green: #a6e3a1;
-  --yellow: #f9e2af;
-  --red: #f38ba8;
-  --mono: 'Courier New', Courier, monospace;
-  --radius: 8px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; }
-a { color: var(--accent); }
-a:hover { text-decoration: underline; }
-header { padding: 1.5rem 2rem; border-bottom: 1px solid #3a3a55; background: var(--surface); }
-header h1 { font-size: 1.4rem; color: var(--accent); }
-header p { color: var(--muted); font-size: 0.88rem; margin-top: 0.2rem; }
-.file-badge { display: inline-block; background: var(--surface2); border-radius: 4px; padding: 0.1rem 0.5rem; font-family: var(--mono); font-size: 0.8rem; color: var(--yellow); margin-top: 0.3rem; }
-.tab-nav { display: flex; padding: 0 2rem; background: var(--surface); border-bottom: 1px solid #3a3a55; flex-wrap: wrap; }
-.tab-btn { padding: 0.75rem 1.2rem; cursor: pointer; border: none; background: none; color: var(--muted); font-size: 0.88rem; border-bottom: 2px solid transparent; transition: all 0.18s; }
-.tab-btn:hover { color: var(--text); }
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
-.tab-panel { display: none; padding: 2rem; max-width: 1280px; margin: 0 auto; }
-.tab-panel.active { display: block; }
-.card { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #3a3a55; }
-.card h3 { color: var(--accent); margin-bottom: 0.6rem; }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-@media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
-.pattern-card { background: var(--surface2); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1rem; border: 1px solid #3a3a55; }
-.pattern-title { font-weight: 600; color: var(--text); font-size: 0.95rem; }
-.pattern-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
-.pattern-layers { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.6rem; }
-.layer { font-size: 0.8rem; padding: 0.28rem 0.6rem; border-radius: 4px; line-height: 1.4; }
-.layer-basics { background: #1e3a2a; color: #a6e3a1; }
-.layer-eng { background: #3a2e1a; color: #f9e2af; }
-.layer-arch { background: #1a2a3e; color: #89b4fa; }
-.layer-label { font-weight: 700; margin-right: 0.35rem; }
-.fix-hint { background: #1e1e2e; border-left: 3px solid var(--yellow); padding: 0.4rem 0.7rem; border-radius: 0 4px 4px 0; font-size: 0.8rem; color: var(--text); margin-top: 0.5rem; }
-code { font-family: var(--mono); font-size: 0.85em; background: #12121e; padding: 0.05em 0.3em; border-radius: 3px; color: var(--yellow); }
-.badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
-.badge-low { background: #1a3220; color: var(--green); }
-.badge-medium { background: #3e2e10; color: var(--yellow); }
-.badge-score { background: var(--surface2); color: var(--accent); font-size: 1rem; font-weight: 700; padding: 0.3rem 0.8rem; border: 1px solid var(--accent); border-radius: var(--radius); }
-.type-banner { display: flex; align-items: center; gap: 1.2rem; padding: 1.1rem 1.5rem; background: var(--surface2); border-radius: var(--radius); margin-bottom: 1.5rem; border: 1px solid #3a3a55; }
-.score-big { font-size: 2.2rem; font-weight: 800; color: var(--accent); line-height: 1; }
-.score-verdict { color: var(--muted); font-size: 0.88rem; }
-.review-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; }
-@media (max-width: 800px) { .review-layout { grid-template-columns: 1fr; } }
-.review-left { background: var(--surface); border-radius: var(--radius); padding: 1.1rem; border: 1px solid #3a3a55; }
-.review-right { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; border: 1px solid #3a3a55; min-height: 320px; }
-.review-item { padding: 0.7rem 0.8rem; border-radius: 6px; cursor: pointer; margin-bottom: 0.5rem; border: 1px solid transparent; transition: all 0.15s; }
-.review-item:hover { border-color: #444; background: var(--surface2); }
-.review-item.selected { border-color: var(--accent); background: var(--surface2); }
-.ri-titlerow { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-.ri-title { font-size: 0.88rem; font-weight: 600; color: var(--text); }
-.ri-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
-pre.snippet { background: #12121e; border-radius: 5px; padding: 0.7rem; font-size: 0.76rem; overflow-x: auto; color: #cdd6f4; font-family: var(--mono); margin: 0.6rem 0; line-height: 1.5; border: 1px solid #2a2a3e; }
-.detail-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
-.detail-title { color: var(--accent); font-size: 1rem; font-weight: 700; }
-.detail-body { color: var(--muted); font-size: 0.86rem; line-height: 1.65; margin-bottom: 0.9rem; }
-.hint-box { background: var(--surface2); border-left: 3px solid var(--accent); padding: 0.6rem 0.8rem; border-radius: 0 4px 4px 0; font-size: 0.84rem; color: var(--text); }
-.perf-card { background: var(--surface2); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1rem; border: 1px solid #3a3a55; }
-.perf-title { font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
-.perf-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
-.ns-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.2rem; background: var(--surface2); border-radius: var(--radius); margin-bottom: 0.8rem; border: 1px solid #3a3a55; }
-.ns-num { font-size: 1.4rem; font-weight: 800; color: var(--accent); min-width: 2rem; line-height: 1.2; }
-.ns-text a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
-.ns-text a:hover { text-decoration: underline; }
-.ns-desc { color: var(--muted); font-size: 0.83rem; margin-top: 0.2rem; }
-.section-head { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; }
-.section-head.green { color: var(--green); }
-.section-head.yellow { color: var(--yellow); }
-.section-head.red { color: var(--red); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Explorer main.py</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #1e1e2e;
+      --surface: #2a2a3e;
+      --surface2: #313148;
+      --text: #cdd6f4;
+      --muted: #a6adc8;
+      --accent: #89b4fa;
+      --green: #a6e3a1;
+      --yellow: #f9e2af;
+      --red: #f38ba8;
+      --mono: 'Courier New', Courier, monospace;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #3a3a55;
+      background: var(--surface);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 0.2rem;
+    }
+
+    .file-badge {
+      display: inline-block;
+      background: var(--surface2);
+      border-radius: 4px;
+      padding: 0.1rem 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--yellow);
+      margin-top: 0.3rem;
+    }
+
+    .tab-nav {
+      display: flex;
+      padding: 0 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid #3a3a55;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.2rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 0.88rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.18s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 2rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .card h3 {
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 800px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pattern-card {
+      background: var(--surface2);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .pattern-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .pattern-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .pattern-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .layer {
+      font-size: 0.8rem;
+      padding: 0.28rem 0.6rem;
+      border-radius: 4px;
+      line-height: 1.4;
+    }
+
+    .layer-basics {
+      background: #1e3a2a;
+      color: #a6e3a1;
+    }
+
+    .layer-eng {
+      background: #3a2e1a;
+      color: #f9e2af;
+    }
+
+    .layer-arch {
+      background: #1a2a3e;
+      color: #89b4fa;
+    }
+
+    .layer-label {
+      font-weight: 700;
+      margin-right: 0.35rem;
+    }
+
+    .fix-hint {
+      background: #1e1e2e;
+      border-left: 3px solid var(--yellow);
+      padding: 0.4rem 0.7rem;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+      color: var(--text);
+      margin-top: 0.5rem;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.85em;
+      background: #12121e;
+      padding: 0.05em 0.3em;
+      border-radius: 3px;
+      color: var(--yellow);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .badge-low {
+      background: #1a3220;
+      color: var(--green);
+    }
+
+    .badge-medium {
+      background: #3e2e10;
+      color: var(--yellow);
+    }
+
+    .badge-score {
+      background: var(--surface2);
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+    }
+
+    .type-banner {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.1rem 1.5rem;
+      background: var(--surface2);
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .score-big {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .score-verdict {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .review-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 800px) {
+      .review-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .review-left {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .review-right {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border: 1px solid #3a3a55;
+      min-height: 320px;
+    }
+
+    .review-item {
+      padding: 0.7rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .review-item:hover {
+      border-color: #444;
+      background: var(--surface2);
+    }
+
+    .review-item.selected {
+      border-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .ri-titlerow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ri-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .ri-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    pre.snippet {
+      background: #12121e;
+      border-radius: 5px;
+      padding: 0.7rem;
+      font-size: 0.76rem;
+      overflow-x: auto;
+      color: #cdd6f4;
+      font-family: var(--mono);
+      margin: 0.6rem 0;
+      line-height: 1.5;
+      border: 1px solid #2a2a3e;
+    }
+
+    .detail-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .detail-title {
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .detail-body {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.65;
+      margin-bottom: 0.9rem;
+    }
+
+    .hint-box {
+      background: var(--surface2);
+      border-left: 3px solid var(--accent);
+      padding: 0.6rem 0.8rem;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.84rem;
+      color: var(--text);
+    }
+
+    .perf-card {
+      background: var(--surface2);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .perf-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .perf-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .ns-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      background: var(--surface2);
+      border-radius: var(--radius);
+      margin-bottom: 0.8rem;
+      border: 1px solid #3a3a55;
+    }
+
+    .ns-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      min-width: 2rem;
+      line-height: 1.2;
+    }
+
+    .ns-text a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .ns-text a:hover {
+      text-decoration: underline;
+    }
+
+    .ns-desc {
+      color: var(--muted);
+      font-size: 0.83rem;
+      margin-top: 0.2rem;
+    }
+
+    .section-head {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section-head.green {
+      color: var(--green);
+    }
+
+    .section-head.yellow {
+      color: var(--yellow);
+    }
+
+    .section-head.red {
+      color: var(--red);
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <h1>Code Explorer</h1>
-  <span class="file-badge">main.py (Updated)</span>
-  <p>Lab8 Pygame | 199 lines | Lifespan & Rebirth with Type Hints</p>
-</header>
+  <header>
+    <h1>Code Explorer</h1>
+    <span class="file-badge">main.py (Updated)</span>
+    <p>Lab8 Pygame | 199 lines | Lifespan & Rebirth with Type Hints</p>
+  </header>
 
-<nav class="tab-nav">
-<button class="tab-btn active" onclick="switchTab('patterns', this)">Patterns</button>
-<button class="tab-btn" onclick="switchTab('typehints', this)">Type Hints</button>
-<button class="tab-btn" onclick="switchTab('codereview', this)">Code Review</button>
-<button class="tab-btn" onclick="switchTab('performance', this)">Performance</button>
-<button class="tab-btn" onclick="switchTab('nextsteps', this)">Next Steps</button>
-</nav>
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('patterns', this)">Patterns</button>
+    <button class="tab-btn" onclick="switchTab('typehints', this)">Type Hints</button>
+    <button class="tab-btn" onclick="switchTab('codereview', this)">Code Review</button>
+    <button class="tab-btn" onclick="switchTab('performance', this)">Performance</button>
+    <button class="tab-btn" onclick="switchTab('nextsteps', this)">Next Steps</button>
+  </nav>
 
-<div id="tab-patterns" class="tab-panel active">
-  <div class="two-col">
-    <div>
-      <div class="section-head green">Good Patterns (3)</div>
-      <div class="pattern-card">
-        <div class="pattern-title">Complete Type Hints</div>
-        <div class="pattern-desc">All methods now fully typed with annotations.</div>
-        <div class="pattern-layers">
-          <div class="layer layer-basics"><span class="layer-label">Basics:</span> IDE autocomplete enabled.</div>
-          <div class="layer layer-eng"><span class="layer-label">Eng:</span> mypy static type checking works.</div>
-          <div class="layer layer-arch"><span class="layer-label">Arch:</span> Clear function contracts.</div>
+  <div id="tab-patterns" class="tab-panel active">
+    <div class="two-col">
+      <div>
+        <div class="section-head green">Good Patterns (3)</div>
+        <div class="pattern-card">
+          <div class="pattern-title">Complete Type Hints</div>
+          <div class="pattern-desc">All methods now fully typed with annotations.</div>
+          <div class="pattern-layers">
+            <div class="layer layer-basics"><span class="layer-label">Basics:</span> IDE autocomplete enabled.</div>
+            <div class="layer layer-eng"><span class="layer-label">Eng:</span> mypy static type checking works.</div>
+            <div class="layer layer-arch"><span class="layer-label">Arch:</span> Clear function contracts.</div>
+          </div>
+        </div>
+        <div class="pattern-card">
+          <div class="pattern-title">Distance-Squared Optimization</div>
+          <div class="pattern-desc">Skips sqrt() in threat detection loop.</div>
+          <div class="pattern-layers">
+            <div class="layer layer-basics"><span class="layer-label">Basics:</span> sqrt(a) < sqrt(b)=a < b.</div>
+                <div class="layer layer-eng"><span class="layer-label">Eng:</span> 2x speedup in O(n).</div>
+                <div class="layer layer-arch"><span class="layer-label">Arch:</span> Real-time at 60fps.</div>
+            </div>
+          </div>
+          <div class="pattern-card">
+            <div class="pattern-title">Delta-Time Physics</div>
+            <div class="pattern-desc">Frame-independent motion and aging.</div>
+            <div class="pattern-layers">
+              <div class="layer layer-basics"><span class="layer-label">Basics:</span> Decouples frame rate.</div>
+              <div class="layer layer-eng"><span class="layer-label">Eng:</span> Same clock for all systems.</div>
+              <div class="layer layer-arch"><span class="layer-label">Arch:</span> Pause-friendly (dt=0).</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-head red">Potential Issues (1)</div>
+          <div class="pattern-card">
+            <div class="pattern-title">Wall Collision Override</div>
+            <div class="pattern-desc">Walls checked after flee logic.</div>
+            <div class="pattern-layers">
+              <div class="layer layer-basics"><span class="layer-label">Basics:</span> Causes corner jitter.</div>
+              <div class="layer layer-eng"><span class="layer-label">Eng:</span> Expected emergent behavior.</div>
+              <div class="layer layer-arch"><span class="layer-label">Arch:</span> Boundaries hard-constrain.</div>
+            </div>
+            <div class="fix-hint">Optional: Add 5-10px buffer zone.</div>
+          </div>
         </div>
       </div>
-      <div class="pattern-card">
-        <div class="pattern-title">Distance-Squared Optimization</div>
-        <div class="pattern-desc">Skips sqrt() in threat detection loop.</div>
-        <div class="pattern-layers">
-          <div class="layer layer-basics"><span class="layer-label">Basics:</span> sqrt(a) < sqrt(b) = a < b.</div>
-          <div class="layer layer-eng"><span class="layer-label">Eng:</span> 2x speedup in O(n).</div>
-          <div class="layer layer-arch"><span class="layer-label">Arch:</span> Real-time at 60fps.</div>
+    </div>
+
+    <div id="tab-typehints" class="tab-panel">
+      <div class="type-banner">
+        <div class="score-big">5/5</div>
+        <div>
+          <div class="score-verdict">Full type hints implementation complete!</div>
         </div>
       </div>
-      <div class="pattern-card">
-        <div class="pattern-title">Delta-Time Physics</div>
-        <div class="pattern-desc">Frame-independent motion and aging.</div>
-        <div class="pattern-layers">
-          <div class="layer layer-basics"><span class="layer-label">Basics:</span> Decouples frame rate.</div>
-          <div class="layer layer-eng"><span class="layer-label">Eng:</span> Same clock for all systems.</div>
-          <div class="layer layer-arch"><span class="layer-label">Arch:</span> Pause-friendly (dt=0).</div>
+      <div class="two-col">
+        <div>
+          <div class="section-head green">Implemented</div>
+          <div class="card">
+            <h3>Module Imports</h3>
+            <p style="color:var(--muted); font-size:0.88rem;">
+              <code>from typing import List, Tuple, Dict, Optional</code></p>
+          </div>
+          <div class="card">
+            <h3>Constants Typed</h3>
+            <p style="color:var(--muted); font-size:0.88rem;"><code>WIDTH: int = 1000</code>,
+              <code>NUM_SQUARES: int = 20</code>, <code>MIN_LIFESPAN: float = 30.0</code></p>
+          </div>
+          <div class="card">
+            <h3>All Methods Annotated</h3>
+            <p style="color:var(--muted); font-size:0.88rem;">Square.__init__, rect(), get_center(), get_alpha(),
+              apply_wander(), calculate_flee_force(), update(), draw_square_with_alpha(), main()</p>
+          </div>
+        </div>
+        <div>
+          <div class="section-head yellow">Type Examples</div>
+          <div class="card">
+            <h3>Constructor</h3>
+            <p style="color:var(--muted); font-size:0.88rem;"><code>def __init__(self, size: int = 30) -> None</code>
+            </p>
+          </div>
+          <div class="card">
+            <h3>Update Method</h3>
+            <p style="color:var(--muted); font-size:0.88rem;">
+              <code>def update(self, dt: float, all_squares: Optional[List['Square']] = None) -> None</code></p>
+          </div>
+          <div class="card">
+            <h3>Flee Force</h3>
+            <p style="color:var(--muted); font-size:0.88rem;">
+              <code>def calculate_flee_force(self, larger_squares: List['Square']) -> Tuple[float, float]</code></p>
+          </div>
         </div>
       </div>
     </div>
-    <div>
-      <div class="section-head red">Potential Issues (1)</div>
-      <div class="pattern-card">
-        <div class="pattern-title">Wall Collision Override</div>
-        <div class="pattern-desc">Walls checked after flee logic.</div>
-        <div class="pattern-layers">
-          <div class="layer layer-basics"><span class="layer-label">Basics:</span> Causes corner jitter.</div>
-          <div class="layer layer-eng"><span class="layer-label">Eng:</span> Expected emergent behavior.</div>
-          <div class="layer layer-arch"><span class="layer-label">Arch:</span> Boundaries hard-constrain.</div>
+
+    <div id="tab-codereview" class="tab-panel">
+      <div class="review-layout">
+        <div class="review-left">
+          <div id="ri-0" class="review-item selected" onclick="selectReview(0)">
+            <div class="ri-titlerow">
+              <span class="ri-title">Type Hints Complete</span>
+              <span class="badge badge-low">low</span>
+            </div>
+            <div class="ri-note">All methods and variables typed.</div>
+          </div>
+          <div id="ri-1" class="review-item" onclick="selectReview(1)">
+            <div class="ri-titlerow">
+              <span class="ri-title">Lifespan & Age Model</span>
+              <span class="badge badge-low">low</span>
+            </div>
+            <div class="ri-note">Delta-time accumulation.</div>
+          </div>
+          <div id="ri-2" class="review-item" onclick="selectReview(2)">
+            <div class="ri-titlerow">
+              <span class="ri-title">Distance-Squared</span>
+              <span class="badge badge-low">low</span>
+            </div>
+            <div class="ri-note">Clever optimization.</div>
+          </div>
+          <div id="ri-3" class="review-item" onclick="selectReview(3)">
+            <div class="ri-titlerow">
+              <span class="ri-title">Surface Caching</span>
+              <span class="badge badge-low">low</span>
+            </div>
+            <div class="ri-note">Good strategy.</div>
+          </div>
+          <div id="ri-4" class="review-item" onclick="selectReview(4)">
+            <div class="ri-titlerow">
+              <span class="ri-title">Wall Collision</span>
+              <span class="badge badge-low">low</span>
+            </div>
+            <div class="ri-note">Expected behavior.</div>
+          </div>
         </div>
-        <div class="fix-hint">Optional: Add 5-10px buffer zone.</div>
+        <div class="review-right" id="review-detail-panel"></div>
       </div>
     </div>
-  </div>
-</div>
 
-<div id="tab-typehints" class="tab-panel">
-  <div class="type-banner">
-    <div class="score-big">5/5</div>
-    <div>
-      <div class="score-verdict">Full type hints implementation complete!</div>
-    </div>
-  </div>
-  <div class="two-col">
-    <div>
-      <div class="section-head green">Implemented</div>
-      <div class="card">
-        <h3>Module Imports</h3>
-        <p style="color:var(--muted); font-size:0.88rem;"><code>from typing import List, Tuple, Dict, Optional</code></p>
-      </div>
-      <div class="card">
-        <h3>Constants Typed</h3>
-        <p style="color:var(--muted); font-size:0.88rem;"><code>WIDTH: int = 1000</code>, <code>NUM_SQUARES: int = 20</code>, <code>MIN_LIFESPAN: float = 30.0</code></p>
-      </div>
-      <div class="card">
-        <h3>All Methods Annotated</h3>
-        <p style="color:var(--muted); font-size:0.88rem;">Square.__init__, rect(), get_center(), get_alpha(), apply_wander(), calculate_flee_force(), update(), draw_square_with_alpha(), main()</p>
-      </div>
-    </div>
-    <div>
-      <div class="section-head yellow">Type Examples</div>
-      <div class="card">
-        <h3>Constructor</h3>
-        <p style="color:var(--muted); font-size:0.88rem;"><code>def __init__(self, size: int = 30) -> None</code></p>
-      </div>
-      <div class="card">
-        <h3>Update Method</h3>
-        <p style="color:var(--muted); font-size:0.88rem;"><code>def update(self, dt: float, all_squares: Optional[List['Square']] = None) -> None</code></p>
-      </div>
-      <div class="card">
-        <h3>Flee Force</h3>
-        <p style="color:var(--muted); font-size:0.88rem;"><code>def calculate_flee_force(self, larger_squares: List['Square']) -> Tuple[float, float]</code></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="tab-codereview" class="tab-panel">
-  <div class="review-layout">
-    <div class="review-left">
-      <div id="ri-0" class="review-item selected" onclick="selectReview(0)">
-        <div class="ri-titlerow">
-          <span class="ri-title">Type Hints Complete</span>
-          <span class="badge badge-low">low</span>
+    <div id="tab-performance" class="tab-panel">
+      <div class="two-col">
+        <div>
+          <div class="section-head green">Wins (3)</div>
+          <div class="perf-card">
+            <div class="perf-title">Distance-Squared Skip</div>
+            <div class="perf-desc">Avoids sqrt(). 2x speedup.</div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-title">Surface Caching</div>
+            <div class="perf-desc">Reuses surfaces. No allocations.</div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-title">Lazy Threat Check</div>
+            <div class="perf-desc">Only larger squares checked.</div>
+          </div>
         </div>
-        <div class="ri-note">All methods and variables typed.</div>
-      </div>
-      <div id="ri-1" class="review-item" onclick="selectReview(1)">
-        <div class="ri-titlerow">
-          <span class="ri-title">Lifespan & Age Model</span>
-          <span class="badge badge-low">low</span>
+        <div>
+          <div class="section-head yellow">Risks (3)</div>
+          <div class="perf-card">
+            <div class="perf-title">Vsync Bottleneck</div>
+            <div class="perf-desc">GPU-limited at 60fps.</div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-title">O(n) Threat</div>
+            <div class="perf-desc">OK at 20. Grid at 1000+.</div>
+          </div>
+          <div class="perf-card">
+            <div class="perf-title">Alpha Blending</div>
+            <div class="perf-desc">Per-frame fills add GPU work.</div>
+          </div>
         </div>
-        <div class="ri-note">Delta-time accumulation.</div>
       </div>
-      <div id="ri-2" class="review-item" onclick="selectReview(2)">
-        <div class="ri-titlerow">
-          <span class="ri-title">Distance-Squared</span>
-          <span class="badge badge-low">low</span>
+      <div style="text-align:center; margin-top:1rem;">
+        <span class="badge-score">4 / 6</span>
+      </div>
+    </div>
+
+    <div id="tab-nextsteps" class="tab-panel">
+      <div class="section-head">Learning Resources</div>
+      <div class="ns-item">
+        <div class="ns-num">1</div>
+        <div class="ns-text">
+          <a href="https://www.python.org/dev/peps/pep-0484/">PEP 484: Type Hints</a>
+          <div class="ns-desc">Full Python typing specification and best practices.</div>
         </div>
-        <div class="ri-note">Clever optimization.</div>
       </div>
-      <div id="ri-3" class="review-item" onclick="selectReview(3)">
-        <div class="ri-titlerow">
-          <span class="ri-title">Surface Caching</span>
-          <span class="badge badge-low">low</span>
+      <div class="ns-item">
+        <div class="ns-num">2</div>
+        <div class="ns-text">
+          <a href="https://docs.pygame.org/en/latest/ref/surface.html">Pygame Surface API</a>
+          <div class="ns-desc">Alpha blending, SRCALPHA, and rendering optimization.</div>
         </div>
-        <div class="ri-note">Good strategy.</div>
       </div>
-      <div id="ri-4" class="review-item" onclick="selectReview(4)">
-        <div class="ri-titlerow">
-          <span class="ri-title">Wall Collision</span>
-          <span class="badge badge-low">low</span>
+      <div class="ns-item">
+        <div class="ns-num">3</div>
+        <div class="ns-text">
+          <a href="https://en.wikipedia.org/wiki/Delta_time">Delta Time in Game Engines</a>
+          <div class="ns-desc">Frame-rate independence and temporal decoupling.</div>
         </div>
-        <div class="ri-note">Expected behavior.</div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">4</div>
+        <div class="ns-text">
+          <a href="https://en.wikipedia.org/wiki/Spatial_partitioning">Spatial Partitioning</a>
+          <div class="ns-desc">Grids and quadtrees for scaling collision detection.</div>
+        </div>
+      </div>
+      <div class="ns-item">
+        <div class="ns-num">5</div>
+        <div class="ns-text">
+          <a href="https://en.wikipedia.org/wiki/Boids">Boids Flocking</a>
+          <div class="ns-desc">Multi-agent AI and emergent behavior patterns.</div>
+        </div>
       </div>
     </div>
-    <div class="review-right" id="review-detail-panel"></div>
-  </div>
-</div>
 
-<div id="tab-performance" class="tab-panel">
-  <div class="two-col">
-    <div>
-      <div class="section-head green">Wins (3)</div>
-      <div class="perf-card">
-        <div class="perf-title">Distance-Squared Skip</div>
-        <div class="perf-desc">Avoids sqrt(). 2x speedup.</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-title">Surface Caching</div>
-        <div class="perf-desc">Reuses surfaces. No allocations.</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-title">Lazy Threat Check</div>
-        <div class="perf-desc">Only larger squares checked.</div>
-      </div>
-    </div>
-    <div>
-      <div class="section-head yellow">Risks (3)</div>
-      <div class="perf-card">
-        <div class="perf-title">Vsync Bottleneck</div>
-        <div class="perf-desc">GPU-limited at 60fps.</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-title">O(n) Threat</div>
-        <div class="perf-desc">OK at 20. Grid at 1000+.</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-title">Alpha Blending</div>
-        <div class="perf-desc">Per-frame fills add GPU work.</div>
-      </div>
-    </div>
-  </div>
-  <div style="text-align:center; margin-top:1rem;">
-    <span class="badge-score">4 / 6</span>
-  </div>
-</div>
+    <script>
+      function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+      }
 
-<div id="tab-nextsteps" class="tab-panel">
-  <div class="section-head">Learning Resources</div>
-  <div class="ns-item">
-    <div class="ns-num">1</div>
-    <div class="ns-text">
-      <a href="https://www.python.org/dev/peps/pep-0484/">PEP 484: Type Hints</a>
-      <div class="ns-desc">Full Python typing specification and best practices.</div>
-    </div>
-  </div>
-  <div class="ns-item">
-    <div class="ns-num">2</div>
-    <div class="ns-text">
-      <a href="https://docs.pygame.org/en/latest/ref/surface.html">Pygame Surface API</a>
-      <div class="ns-desc">Alpha blending, SRCALPHA, and rendering optimization.</div>
-    </div>
-  </div>
-  <div class="ns-item">
-    <div class="ns-num">3</div>
-    <div class="ns-text">
-      <a href="https://en.wikipedia.org/wiki/Delta_time">Delta Time in Game Engines</a>
-      <div class="ns-desc">Frame-rate independence and temporal decoupling.</div>
-    </div>
-  </div>
-  <div class="ns-item">
-    <div class="ns-num">4</div>
-    <div class="ns-text">
-      <a href="https://en.wikipedia.org/wiki/Spatial_partitioning">Spatial Partitioning</a>
-      <div class="ns-desc">Grids and quadtrees for scaling collision detection.</div>
-    </div>
-  </div>
-  <div class="ns-item">
-    <div class="ns-num">5</div>
-    <div class="ns-text">
-      <a href="https://en.wikipedia.org/wiki/Boids">Boids Flocking</a>
-      <div class="ns-desc">Multi-agent AI and emergent behavior patterns.</div>
-    </div>
-  </div>
-</div>
+      const reviewItems = [
+        { id: 0, title: 'Complete Type Hints Implementation', severity: 'low', snippet: 'from typing import List, Tuple, Dict, Optional\n\ndef __init__(self, size: int = 30) -> None:\n    self.x: float = 0.0', fullExplanation: 'All 9 methods and all instance variables now have full type annotations.\n\nBenefits: (1) IDE autocomplete and inline docs. (2) mypy static analysis. (3) Clear contracts. (4) Refactoring safety.', improvementHint: 'Run mypy: mypy main.py --strict' },
+        { id: 1, title: 'Lifespan & Age Model Design', severity: 'low', snippet: 'self.age: float = 0.0\nself.lifespan: float = random.uniform(MIN_LIFESPAN, MAX_LIFESPAN)\n\ndef update(self, dt: float, ...) -> None:\n    self.age += dt', fullExplanation: 'Delta-time based age accumulation is elegant.\n\nBenefits: (1) Pause-friendly (dt=0). (2) Same clock as physics. (3) Fresh lifespan per square. (4) Seamless integration.', improvementHint: 'Add age/lifespan ratio to HUD for debugging.' },
+        { id: 2, title: 'Distance-Squared Optimization', severity: 'low', snippet: 'dist_squared = dx**2 + dy**2\nthreat_radius = FLEE_RADIUS_MULTIPLIER * other.size\nif dist_squared < threat_radius**2:\n    dist = math.sqrt(dist_squared)', fullExplanation: 'Mathematically equivalent: sqrt(a) < sqrt(b)  a < b.\n\nPerformance: ~1200 checks/frame; sqrt() avoided most times. Result: ~2x speedup.', improvementHint: 'Use spatial grid for 100+ squares.' },
+        { id: 3, title: 'Surface Caching Strategy', severity: 'low', snippet: 'key: Tuple[int, Tuple[int, int, int]] = (square.size, square.color)\nif key not in surface_cache:\n    surf = pygame.Surface((square.size, square.size), pygame.SRCALPHA)\n    surface_cache[key] = surf', fullExplanation: 'Pragmatic trade-off: cache (size, color) prevents expensive surface re-creation, fill() runs per-frame (cheap).\n\nAt 20 squares, 60fps: ~1.2M pixels/sec. GPU efficient.', improvementHint: 'Track cache stats for optimization.' },
+        { id: 4, title: 'Wall Collision Priority', severity: 'low', snippet: 'self.vx = 0.8 * self.vx + FLEE_FORCE_WEIGHT * flee_vx\nif self.x < 0:\n    self.x = 0\n    self.vx = abs(self.vx)', fullExplanation: 'Walls checked after flee logic creates corner jitter. Intentional.\n\nReasoning: Boundaries hard-constrain; fleeing is soft. Creates emergent struggle behavior.', improvementHint: 'Optional: Add buffer zone for smoother retreat.' }
+      ];
 
-<script>
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-}
+      function escH(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-const reviewItems = [
-  { id: 0, title: 'Complete Type Hints Implementation', severity: 'low', snippet: 'from typing import List, Tuple, Dict, Optional\n\ndef __init__(self, size: int = 30) -> None:\n    self.x: float = 0.0', fullExplanation: 'All 9 methods and all instance variables now have full type annotations.\n\nBenefits: (1) IDE autocomplete and inline docs. (2) mypy static analysis. (3) Clear contracts. (4) Refactoring safety.', improvementHint: 'Run mypy: mypy main.py --strict' },
-  { id: 1, title: 'Lifespan & Age Model Design', severity: 'low', snippet: 'self.age: float = 0.0\nself.lifespan: float = random.uniform(MIN_LIFESPAN, MAX_LIFESPAN)\n\ndef update(self, dt: float, ...) -> None:\n    self.age += dt', fullExplanation: 'Delta-time based age accumulation is elegant.\n\nBenefits: (1) Pause-friendly (dt=0). (2) Same clock as physics. (3) Fresh lifespan per square. (4) Seamless integration.', improvementHint: 'Add age/lifespan ratio to HUD for debugging.' },
-  { id: 2, title: 'Distance-Squared Optimization', severity: 'low', snippet: 'dist_squared = dx**2 + dy**2\nthreat_radius = FLEE_RADIUS_MULTIPLIER * other.size\nif dist_squared < threat_radius**2:\n    dist = math.sqrt(dist_squared)', fullExplanation: 'Mathematically equivalent: sqrt(a) < sqrt(b)  a < b.\n\nPerformance: ~1200 checks/frame; sqrt() avoided most times. Result: ~2x speedup.', improvementHint: 'Use spatial grid for 100+ squares.' },
-  { id: 3, title: 'Surface Caching Strategy', severity: 'low', snippet: 'key: Tuple[int, Tuple[int, int, int]] = (square.size, square.color)\nif key not in surface_cache:\n    surf = pygame.Surface((square.size, square.size), pygame.SRCALPHA)\n    surface_cache[key] = surf', fullExplanation: 'Pragmatic trade-off: cache (size, color) prevents expensive surface re-creation, fill() runs per-frame (cheap).\n\nAt 20 squares, 60fps: ~1.2M pixels/sec. GPU efficient.', improvementHint: 'Track cache stats for optimization.' },
-  { id: 4, title: 'Wall Collision Priority', severity: 'low', snippet: 'self.vx = 0.8 * self.vx + FLEE_FORCE_WEIGHT * flee_vx\nif self.x < 0:\n    self.x = 0\n    self.vx = abs(self.vx)', fullExplanation: 'Walls checked after flee logic creates corner jitter. Intentional.\n\nReasoning: Boundaries hard-constrain; fleeing is soft. Creates emergent struggle behavior.', improvementHint: 'Optional: Add buffer zone for smoother retreat.' }
-];
+      function selectReview(id) {
+        document.querySelectorAll('.review-item').forEach(el => el.classList.remove('selected'));
+        document.getElementById('ri-' + id).classList.add('selected');
+        const item = reviewItems[id];
+        const sevClass = 'badge-' + item.severity;
+        const body = item.fullExplanation.replace(/\n/g, '<br>');
+        document.getElementById('review-detail-panel').innerHTML = `<div><div class="detail-head"><span class="detail-title">${escH(item.title)}</span><span class="badge ${escH(sevClass)}">${escH(item.severity)}</span></div><div class="detail-body">${body}</div><pre class="snippet">${escH(item.snippet)}</pre><div class="hint-box"> <strong>Improvement:</strong> ${escH(item.improvementHint)}</div></div>`;
+      }
 
-function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function selectReview(id) {
-  document.querySelectorAll('.review-item').forEach(el => el.classList.remove('selected'));
-  document.getElementById('ri-' + id).classList.add('selected');
-  const item = reviewItems[id];
-  const sevClass = 'badge-' + item.severity;
-  const body = item.fullExplanation.replace(/\n/g, '<br>');
-  document.getElementById('review-detail-panel').innerHTML = `<div><div class="detail-head"><span class="detail-title">${escH(item.title)}</span><span class="badge ${escH(sevClass)}">${escH(item.severity)}</span></div><div class="detail-body">${body}</div><pre class="snippet">${escH(item.snippet)}</pre><div class="hint-box"> <strong>Improvement:</strong> ${escH(item.improvementHint)}</div></div>`;
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  selectReview(0);
-});
-</script>
+      window.addEventListener('DOMContentLoaded', () => {
+        selectReview(0);
+      });
+    </script>
 </body>
+
 </html>

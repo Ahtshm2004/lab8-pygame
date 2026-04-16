@@ -1,10 +1,12 @@
-# Animated Squares with Inertia-Based Fleeing
+# Animated Squares with Inertia-Based Fleeing & Lifespan
 
-A sophisticated pygame-based animation demonstrating emergent ecosystem behavior through physics-based simulation. **20 colored squares** of varying sizes interact through inertia-based speed scaling, threat detection, and organic wandering behavior—creating a compelling predator-prey-like dynamic without explicit chase logic.
+A sophisticated pygame-based animation demonstrating emergent ecosystem behavior through physics-based simulation. **20 colored squares** of varying sizes interact through inertia-based speed scaling, threat detection, organic wandering behavior, and dynamic lifecycle management—creating a compelling predator-prey-like dynamic with continuous regeneration of dying squares.
 
 ## Features
 
 - **20 animated squares** with random colors and sizes (30–80 pixels)
+- **Dynamic lifespan system**: squares live 30–60 seconds before natural death
+- **Smooth fade transitions**: fade in at birth (2s) and fade out before death (2s)
 - **Size-based speed scaling**: smaller squares move faster (inertia effect)
 - **Fleeing behavior**: small squares actively flee from nearby larger ones
 - **Threat detection**: proximity-based awareness (3.5× threat radius)
@@ -35,6 +37,11 @@ FLEE_RADIUS_MULTIPLIER = 3.5   # Threat detected at 3.5× larger square's size
 FLEE_FORCE_WEIGHT = 0.2        # 20% flee force blended with current velocity
 WANDER_CHANCE = 0.1            # 10% chance per frame to apply random jitter
 WANDER_ANGLE_RANGE = 10        # ±10 degrees for random direction changes
+
+# Lifespan & Fade
+MIN_LIFESPAN = 30.0            # Minimum lifespan in seconds
+MAX_LIFESPAN = 60.0            # Maximum lifespan in seconds
+FADE_DURATION = 2.0            # Fade in/fade out duration in seconds
 ```
 
 ## Prerequisites
@@ -60,6 +67,13 @@ python main.py
 
 - **ESC key**: quit the demo
 - **Close window button**: quit the demo
+
+## Code Quality
+
+- ✅ **Full type hints**: All functions and variables are properly annotated (PEP 484)
+- ✅ **Static type checking**: Compatible with mypy and pyright
+- ✅ **Type safety**: Clear function contracts and IDE autocomplete support
+- ✅ **Pythonic design**: Clean separation of concerns with Square class and utility functions
 
 ## How It Works
 
@@ -95,7 +109,18 @@ Every frame, small random perturbations are applied to velocity direction:
 3. **Speed Preservation**: Magnitude maintained; only direction changes
 4. **Effect**: Creates natural "swimming" motion with subtle course corrections
 
-### 4. Frame-Rate Independence
+### 4. Lifespan & Fade Transitions
+
+Each square has a limited lifespan with smooth visual transitions:
+
+1. **Lifespan Assignment**: Each square randomly lives 30–60 seconds
+2. **Fade-In**: Over first 2 seconds, alpha grows from 0 to 255 (birth animation)
+3. **Full Life**: Maintains 100% opacity while age < lifespan - FADE_DURATION
+4. **Fade-Out**: In final 2 seconds before death, alpha fades 255 → 0 (death animation)
+5. **Natural Death**: Marked as dead when `age >= lifespan`
+6. **Effect**: Smooth birth/death visual feedback; suggests continuous ecosystem cycle
+
+### 5. Frame-Rate Independence
 
 Movement is normalized across different frame rates:
 
@@ -113,6 +138,7 @@ The `× 60` factor ensures consistent speed whether running at 30 FPS or 120 FPS
 | **Threat Detection** | Distance-squared proximity checks | Efficient performance, realistic awareness |
 | **Steering** | Velocity blending rather than override | Smooth curves instead of robotic snaps |
 | **Wandering** | Angle-based jitter with speed preservation | Organic, natural-looking motion |
+| **Lifecycle** | Age tracking with fade-in/fade-out transitions | Visual continuity of birth and death |
 | **Collision** | Wall bouncing with velocity reversal | Realistic boundary behavior |
 
 ## Customization Examples
@@ -150,7 +176,9 @@ When running the demo, you'll notice:
 - 🔴 **Large squares**: Move ponderously, create "safe zones" away from them
 - 🌊 **Fleeing effect**: Small squares curve away when large ones approach
 - 🎨 **Organic motion**: Nothing moves perfectly straight—all exhibit natural jitter
-- 📍 **Clustering**: Over time, large and small squares may cluster into distinct regions
+- ✨ **Fade-in effect**: New squares gently appear with increasing opacity over 2 seconds
+- 👻 **Fade-out effect**: Dying squares gradually fade to transparent over final 2 seconds
+- 🔄 **Continuous cycle**: As squares die, the system naturally maintains 20 active squares
 
 ## Performance Notes
 
